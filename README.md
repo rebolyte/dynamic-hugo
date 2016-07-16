@@ -1,0 +1,3 @@
+# Dynamic Hugo
+
+Coming soon.
