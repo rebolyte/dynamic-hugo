@@ -6,40 +6,45 @@
 	<!-- For S3 bucket CORS config -->
 	<!-- https://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-configuring.html -->
 
-	<script src="vendor/aws-sdk-2.4.1.js"></script>
+	<!-- <script src="vendor/aws-sdk-2.4.1.js"></script> -->
 
-	<script>
-		// https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Credentials.html
-		// http://stackoverflow.com/a/27561468/2486583
-		// Also see sample code within Cognito in AWS Console.
-		// https://forums.aws.amazon.com/thread.jspa?threadID=179420
-		// https://mobile.awsblog.com/post/TxBVEDL5Z8JKAC/Use-Amazon-Cognito-in-your-website-for-simple-AWS-authentication
-		AWS.config.region = 'us-east-1';
-		AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-			IdentityPoolId: 'xx'
-		});
-
-		AWS.config.credentials.clearCachedId();
-
-		AWS.config.credentials.get(function (err) {
-			if (err) { console.error(err); }
-			else { console.log('cognito credentials loaded'); }
-		});
-	</script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="node_modules/keen-ui/dist/keen-ui.css">
 </head>
 <body>
+
+<template id="loginDialogTemplate">
+    <div
+    class="ui-modal ui-modal-mask" v-show="show" :transition="transition">
+        <div class="ui-modal-wrapper" v-el:modal-mask>
+            <div class="ui-modal-container" tabindex="-1" v-el:modal-container>
+                <div class="ui-modal-header">
+                    <slot name="header">
+                        <h1 v-text="header" class="ui-modal-header-text"></h1>
+                    </slot>
+                </div>
+
+                <div class="ui-modal-body">
+                    <slot>
+                        <ui-textbox @keydown="emailChange" name="email" type="text" placeholder="email"></ui-textbox>
+                        <ui-textbox @keydown="passChange" name="password" type="password" placeholder="password"></ui-textbox>
+                        <ui-button @click="login" color="primary">Login</ui-button>
+                    </slot>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
 
 <div id="app">
 
 	<h1>{{ title }}</h1>
 
-	<input type="text" autocomplete="email" id="emailFld" placeholder="email">
-	<input type="password" id="passFld" placeholder="password">
-	<button id="loginBtn">Login</button>
+	<login-dialog show header="Admin Login"></login-dialog>
 
 	<br><br>
 
-	<button id="listBtn">List objects</button>
+	<ui-button @click="listObjects">List objects</ui-button>
 
 	<br><br>
 
@@ -47,12 +52,12 @@
 
 	<br>
 
-	<button id="postBtn">Create new post</button>
+	<ui-button id="postBtn">Create new post</ui-button>
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.js"></script>
-<script src="main.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.js"></script> -->
+<script src="dist/bundle.js"></script>
 	
 </body>
 </html>

@@ -2,3 +2,4 @@ node_modules/
 lambda_build/build
 lambda_build/hugo
 LambdAuth
+client/dist/
