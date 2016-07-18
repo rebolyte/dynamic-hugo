@@ -1,4 +1,5 @@
 /* eslint-env node, browser */
+/* global $ */
 
 'use strict';
 
@@ -7,8 +8,7 @@
 require('aws-sdk/dist/aws-sdk');
 var AWS = window.AWS;
 var Vue = require('vue');
-var Keen = require('keen-ui');
-var $ = require('dominus');
+var semantic = require('../node_modules/semantic-ui-css/semantic.js');
 
 // --- AWS config
 
@@ -98,8 +98,6 @@ ready(function () {
 		});
 	});
 
-	Vue.use(Keen);
-
 	Vue.component('login-dialog', {
 		template: '#loginDialogTemplate',
 		data: function () {
@@ -113,57 +111,56 @@ ready(function () {
 				type: Boolean,
 				// required: true,
 				twoWay: true
-			},
-			header: {
-				type: String,
-				default: 'Login'
-			},
-			body: {
-				type: String,
-				default: 'body'
-			},
-			transition: {
-				type: String,
-				default: 'ui-modal-fade' // 'ui-modal-scale', or 'ui-modal-fade'
 			}
 		},
-		beforeDestroy: function () {
+		// called after compilation is finished
+		ready: function () {
 			if (this.show) {
-				this.tearDown();
+				this.open();
 			}
 		},
 		methods: {
-			tearDown: function () {
-				$('body').removeClass('ui-modal-open');
-			},
 			login: function () {
-				sendLogin(this.email, this.password).then(function (resp) {
-					if (resp.success) {
-						console.log('success');
-						this.show = false;
-						this.tearDown();
-					} else {
-						alert('login failed');
-					}
-				}.bind(this)).catch(function (err) {
-					console.error(err);
-				});
+				return sendLogin(this.email, this.password);
 			},
-			emailChange: function (evt) {
-				this.email = evt.target.value;
+			// http://stackoverflow.com/a/29713297/2486583
+			open: function () {
+				$(this.$els.modal)
+					.modal({
+						'closable': false,
+						onApprove: function () {
+							$(this.$els.form).submit();
+							// Prevent modal from closing
+							return false;
+						}.bind(this)
+					})
+					.modal('show');
+				$(this.$els.form)
+					.submit(function (evt) {
+						evt.preventDefault();
+						if ($(this.$els.form).form('validate form')) {
+							this.login().then(function (resp) {
+								if (resp.success) {
+									console.log('success');
+									this.close();
+								} else {
+									alert('login failed');
+								}
+							}.bind(this)).catch(function (err) {
+								console.error(err);
+							});
+						}
+					}.bind(this))
+					.form({
+						fields: {
+							email: 'email',
+							password: 'empty'
+						}
+					});
 			},
-			passChange: function (evt) {
-				this.password = evt.target.value;
+			close: function () {
+				$(this.$els.modal).modal('hide');
 			}
-		},
-		events: {
-			'show-login': function () {
-				this.show = true;
-			}
-		},
-		components: {
-			uiTextbox: Keen.uiTextbox,
-			uiButton: Keen.uiButton
 		}
 	});
 
@@ -185,9 +182,10 @@ ready(function () {
 			}
 		},
 		created: function () {
-			this.$broadcast('show-login', 'yep');
+			$('.ui.modal').modal('show');
 		}
 	});
+
 });
 
 

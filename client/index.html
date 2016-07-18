@@ -8,43 +8,93 @@
 
 	<!-- <script src="vendor/aws-sdk-2.4.1.js"></script> -->
 
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link rel="stylesheet" href="node_modules/keen-ui/dist/keen-ui.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/semantic-ui-css/semantic.min.css">
 </head>
 <body>
 
 <template id="loginDialogTemplate">
-    <div
-    class="ui-modal ui-modal-mask" v-show="show" :transition="transition">
-        <div class="ui-modal-wrapper" v-el:modal-mask>
-            <div class="ui-modal-container" tabindex="-1" v-el:modal-container>
-                <div class="ui-modal-header">
-                    <slot name="header">
-                        <h1 v-text="header" class="ui-modal-header-text"></h1>
-                    </slot>
-                </div>
-
-                <div class="ui-modal-body">
-                    <slot>
-                        <ui-textbox @keydown="emailChange" name="email" type="text" placeholder="email"></ui-textbox>
-                        <ui-textbox @keydown="passChange" name="password" type="password" placeholder="password"></ui-textbox>
-                        <ui-button @click="login" color="primary">Login</ui-button>
-                    </slot>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="ui small modal" v-el:modal>
+		<div class="header">Login</div>
+		<div class="content">
+			<form class="ui form" v-el:form>
+				<div class="field">
+					<label>Email</label>
+					<input type="text" name="email" v-model="email" placeholder="me@abc.com">
+				</div>
+				<div class="field">
+					<label>Password</label>
+					<input type="password" name="password" v-model="password">
+				</div>
+				<div class="ui error message"></div>
+			</form>
+		</div>
+		<div class="actions">
+			<div class="ui positive labeled icon button" v-el:login-button>
+				<i class="checkmark icon"></i>
+				Login
+			</div>
+		</div>
+	</div>
 </template>
 
 <div id="app">
 
 	<h1>{{ title }}</h1>
 
-	<login-dialog show header="Admin Login"></login-dialog>
+	<login-dialog show></login-dialog>
 
 	<br><br>
 
-	<ui-button @click="listObjects">List objects</ui-button>
+	<div style="max-width: 600px">
+		<table class="ui celled striped table"">
+			<thead>
+				<tr><th colspan="3">
+					Posts
+				</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="collapsing">
+						filename.md
+					</td>
+					<td>Title goes here</td>
+					<td class="right aligned collapsing">2016-02-04</td>
+				</tr>
+				<tr>
+					<td class="collapsing">
+						filename.md
+					</td>
+					<td>Title goes here</td>
+					<td class="right aligned collapsing">2016-02-04</td>
+				</tr>
+				<tr>
+					<td class="collapsing">
+						filename.md
+					</td>
+					<td>Title goes here</td>
+					<td class="right aligned collapsing">2016-02-04</td>
+				</tr>
+				<tr>
+					<td class="collapsing">
+						filename.md
+					</td>
+					<td>Title goes here</td>
+					<td class="right aligned collapsing">2016-02-04</td>
+				</tr>
+				<tr>
+					<td class="collapsing">
+						filename.md
+					</td>
+					<td>Title goes here</td>
+					<td class="right aligned collapsing">2016-02-04</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<br><br>
+
+	<button @click="listObjects" class="ui button">List objects</button>
 
 	<br><br>
 
@@ -52,7 +102,7 @@
 
 	<br>
 
-	<ui-button id="postBtn">Create new post</ui-button>
+	<button id="postBtn" class="ui primary button">Create new post</button>
 
 </div>
 

@@ -1,7 +1,7 @@
 /* eslint-env node */
 'use strict';
 
-// let webpack = require('webpack');
+let webpack = require('webpack');
 let path = require('path');
 
 let SRC_DIR = path.resolve(__dirname, 'src');
@@ -12,5 +12,13 @@ module.exports = {
 	output: {
 		path: DIST_DIR,
 		filename: 'bundle.js'
-	}
+	},
+	// https://webpack.github.io/docs/list-of-plugins.html#provideplugin
+	plugins: [
+		new webpack.ProvidePlugin({
+			'$': 'jquery',
+			'jQuery': 'jquery',
+			'window.jQuery': 'jquery'
+		})
+	]
 };
