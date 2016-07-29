@@ -76,15 +76,124 @@ function sendLogin(email, pass) {
 	});
 }
 
-function ready(fn) {
-	if (document.readyState !== 'loading'){
-		fn();
-	} else {
-		document.addEventListener('DOMContentLoaded', fn);
-	}
-}
+var bus = new Vue();
 
-ready(function () {
+var LoginDialog = Vue.extend({
+	template: '#loginDialogTemplate',
+	name: 'LoginDialog', // not required, but useful for debugging
+	data: function () {
+		return {
+			email: '',
+			password: ''
+		};
+	},
+	props: {
+		show: {
+			type: Boolean,
+			// required: true,
+			twoWay: true
+		}
+	},
+	// called after compilation is finished
+	ready: function () {
+		if (this.show) {
+			this.open();
+		}
+	},
+	methods: {
+		login: function () {
+			return sendLogin(this.email, this.password);
+		},
+		// http://stackoverflow.com/a/29713297/2486583
+		open: function () {
+			$(this.$els.modal)
+				.modal({
+					'closable': false,
+					onApprove: function () {
+						$(this.$els.form).submit();
+						// Prevent modal from closing
+						return false;
+					}.bind(this)
+				})
+				.modal('show');
+			$(this.$els.form)
+				.submit(function (evt) {
+					evt.preventDefault();
+					if ($(this.$els.form).form('validate form')) {
+						this.login().then(function (resp) {
+							if (resp.success) {
+								console.log('success');
+								this.close();
+							} else {
+								alert('login failed');
+							}
+						}.bind(this)).catch(function (err) {
+							console.error(err);
+						});
+					}
+				}.bind(this))
+				.form({
+					fields: {
+						email: 'email',
+						password: 'empty'
+					}
+				});
+		},
+		close: function () {
+			$(this.$els.modal).modal('hide');
+		}
+	}
+});
+
+var Post = Vue.extend({
+	template: '#postTemplate',
+	name: 'Post',
+	props: ['post'],
+	methods: {
+		selected: function (evt) {
+			console.log(evt.target);
+		}
+	}
+});
+
+var PostList = Vue.extend({
+	template: '#postListTemplate',
+	name: 'PostList',
+	data: function () {
+		return {
+			posts: []
+		};
+	},
+	methods: {
+		getPosts: function (evt) {
+			var params = {
+				Bucket: 'ji-blog-src',
+				Prefix: 'content/'
+			};
+			s3.listObjects(params, function (err, data) {
+				if (err) { throw new Error(err); }
+				console.log(data.Contents);
+				this.posts = data.Contents.map(function (o) {
+					return {
+						filename: o.Key,
+						date: o.LastModified
+					};
+				});
+			}.bind(this));
+		}
+	},
+	created: function () {
+		bus.$on('logged-in', this.getPosts);
+	},
+	destroyed: function () {
+		bus.$off('logged-in', this.getPosts);
+	},
+	components: {
+		'post': Post
+	}
+});
+
+$(document).ready(function () {
 
 	$('#postBtn').on('click', function () {
 		var params = {
@@ -98,94 +207,20 @@ ready(function () {
 		});
 	});
 
-	Vue.component('login-dialog', {
-		template: '#loginDialogTemplate',
-		data: function () {
-			return {
-				email: '',
-				password: ''
-			};
-		},
-		props: {
-			show: {
-				type: Boolean,
-				// required: true,
-				twoWay: true
-			}
-		},
-		// called after compilation is finished
-		ready: function () {
-			if (this.show) {
-				this.open();
-			}
-		},
-		methods: {
-			login: function () {
-				return sendLogin(this.email, this.password);
-			},
-			// http://stackoverflow.com/a/29713297/2486583
-			open: function () {
-				$(this.$els.modal)
-					.modal({
-						'closable': false,
-						onApprove: function () {
-							$(this.$els.form).submit();
-							// Prevent modal from closing
-							return false;
-						}.bind(this)
-					})
-					.modal('show');
-				$(this.$els.form)
-					.submit(function (evt) {
-						evt.preventDefault();
-						if ($(this.$els.form).form('validate form')) {
-							this.login().then(function (resp) {
-								if (resp.success) {
-									console.log('success');
-									this.close();
-								} else {
-									alert('login failed');
-								}
-							}.bind(this)).catch(function (err) {
-								console.error(err);
-							});
-						}
-					}.bind(this))
-					.form({
-						fields: {
-							email: 'email',
-							password: 'empty'
-						}
-					});
-			},
-			close: function () {
-				$(this.$els.modal).modal('hide');
-			}
-		}
-	});
-
 	new Vue({
 		el: '#app',
 		data: {
 			title: 'blog admin'
 		},
 		methods: {
-			listObjects: function (evt) {
-				var params = {
-					Bucket: 'ji-blog-src',
-					Prefix: 'content/'
-				};
-				s3.listObjects(params, function (err, data) {
-					if (err) { throw new Error(err); }
-					console.log(data.Contents);
-				});
+			getPosts: function () {
+				bus.$emit('logged-in');
 			}
 		},
-		created: function () {
-			$('.ui.modal').modal('show');
+		components: {
+			'login-dialog': LoginDialog,
+			'post-list': PostList
 		}
 	});
 
 });
-
-

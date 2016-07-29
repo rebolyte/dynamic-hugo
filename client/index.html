@@ -37,64 +37,41 @@
 	</div>
 </template>
 
+<template id="postListTemplate">
+	<table class="ui celled striped table"">
+		<thead>
+			<tr><th colspan="3">
+				Posts
+			</th></tr>
+		</thead>
+		<tbody>
+			<!-- http://vuejs.org/guide/components.html#Template-Parsing -->
+			<tr is="post" v-for="post in posts" :post="post"></tr>
+		</tbody>
+	</table>
+</template>
+
+<template id="postTemplate">
+	<tr>
+		<td class="collapsing">
+			<a href="#" @click="selected">{{ post.filename }}</a>
+		</td>
+		<td class="right aligned collapsing">{{ post.date }}</td>
+	</tr>
+</template>
+
 <div id="app">
+	<login-dialog show></login-dialog>
 
 	<h1>{{ title }}</h1>
 
-	<login-dialog show></login-dialog>
+	<br><br>
+
+	<post-list></post-list>
 
 	<br><br>
 
-	<div style="max-width: 600px">
-		<table class="ui celled striped table"">
-			<thead>
-				<tr><th colspan="3">
-					Posts
-				</th></tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td class="collapsing">
-						filename.md
-					</td>
-					<td>Title goes here</td>
-					<td class="right aligned collapsing">2016-02-04</td>
-				</tr>
-				<tr>
-					<td class="collapsing">
-						filename.md
-					</td>
-					<td>Title goes here</td>
-					<td class="right aligned collapsing">2016-02-04</td>
-				</tr>
-				<tr>
-					<td class="collapsing">
-						filename.md
-					</td>
-					<td>Title goes here</td>
-					<td class="right aligned collapsing">2016-02-04</td>
-				</tr>
-				<tr>
-					<td class="collapsing">
-						filename.md
-					</td>
-					<td>Title goes here</td>
-					<td class="right aligned collapsing">2016-02-04</td>
-				</tr>
-				<tr>
-					<td class="collapsing">
-						filename.md
-					</td>
-					<td>Title goes here</td>
-					<td class="right aligned collapsing">2016-02-04</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-
-	<br><br>
-
-	<button @click="listObjects" class="ui button">List objects</button>
+	<button @click="getPosts" class="ui button">Get Posts</button>
 
 	<br><br>
 
