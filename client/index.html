@@ -67,20 +67,13 @@
 
 	<br><br>
 
-	<post-list></post-list>
+	<ul>
+		<li><a href="#" v-link="{ path: '/compose' }">Create New Post</a></li>
+		<li><a href="#" v-link="{ path: '/posts' }">Post List</a></li>
+		<li><a href="#" v-link="{ path: '/settings' }">Settings</a></li>
+	</ul>
 
-	<br><br>
-
-	<button @click="getPosts" class="ui button">Get Posts</button>
-
-	<br><br>
-
-	<textarea name="post" id="postFld" cols="65" rows="10"></textarea>
-
-	<br>
-
-	<button id="postBtn" class="ui primary button">Create new post</button>
-
+	<router-view></router-view>
 </div>
 
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.js"></script> -->

@@ -8,6 +8,7 @@
 require('aws-sdk/dist/aws-sdk');
 var AWS = window.AWS;
 var Vue = require('vue');
+var VueRouter = require('vue-router');
 var semantic = require('../node_modules/semantic-ui-css/semantic.js');
 
 // --- AWS config
@@ -193,6 +194,32 @@ var PostList = Vue.extend({
 	}
 });
 
+var ComposePanel = Vue.extend({
+	template: '<p>This is the post compose/edit page</p>' +
+		'<textarea name="post" id="postFld" cols="65" rows="10"></textarea>' +
+		'<br>' +
+		'<button id="postBtn" class="ui primary button">Publish</button>'
+});
+
+var PostsPanel = Vue.extend({
+	template: '<p>This is the list of posts</p>' +
+		'<post-list></post-list>' +
+		'<br><br>' +
+		'<button @click="getPosts" class="ui button">Get Posts</button>',
+	methods: {
+		getPosts: function () {
+			bus.$emit('logged-in');
+		}
+	},
+	components: {
+		'post-list': PostList
+	}
+});
+
+var SettingsPanel = Vue.extend({
+	template: '<p>This is the settings page, fool!</p>'
+});
+
 $(document).ready(function () {
 
 	$('#postBtn').on('click', function () {
@@ -207,20 +234,38 @@ $(document).ready(function () {
 		});
 	});
 
-	new Vue({
-		el: '#app',
-		data: {
-			title: 'blog admin'
-		},
-		methods: {
-			getPosts: function () {
-				bus.$emit('logged-in');
-			}
+	Vue.use(VueRouter);
+
+	// Root element for the router. Note that this is not an instance of Vue.
+	var App = Vue.extend({
+		data: function () {
+			return {
+				title: 'blog admin'
+			};
 		},
 		components: {
-			'login-dialog': LoginDialog,
-			'post-list': PostList
+			'login-dialog': LoginDialog
 		}
 	});
+
+	var router = new VueRouter();
+
+	router.map({
+		'/posts': {
+			component: PostsPanel
+		},
+		'/compose': {
+			component: ComposePanel
+		},
+		'/settings': {
+			component: SettingsPanel
+		}
+	});
+
+	router.alias({
+		'/': '/posts'
+	});
+
+	router.start(App, '#app');
 
 });
