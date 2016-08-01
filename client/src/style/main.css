@@ -1,0 +1,18 @@
+#app {
+	width: 70%;
+	margin: 0px auto;
+}
+.menu {
+	width: 18%;
+	float: left;
+}
+.content {
+	width: 80%;
+	float: right;
+}
+
+span.link {
+	cursor: pointer;
+	color: blue;
+	text-decoration: underline;
+}

@@ -5,7 +5,7 @@
 require('aws-sdk/dist/aws-sdk');
 var AWS = window.AWS;
 var bus = require('../bus');
-var template = require('raw!./LoginDialog.html');
+var template = require('./LoginDialog.html');
 
 var lambda = new AWS.Lambda({
 	region: 'us-east-1'
@@ -89,8 +89,8 @@ module.exports = {
 					if ($(this.$els.form).form('validate form')) {
 						this.login().then(function (resp) {
 							if (resp.success) {
-								console.log('success');
 								this.close();
+								bus.$emit('logged-in');
 							} else {
 								alert('login failed');
 							}

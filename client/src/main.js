@@ -1,6 +1,5 @@
 /* eslint-env node, browser */
 /* global $ */
-
 'use strict';
 
 // Webpack + AWS SDK workaround
@@ -9,7 +8,8 @@ require('aws-sdk/dist/aws-sdk');
 var AWS = window.AWS;
 var Vue = require('vue');
 var VueRouter = require('vue-router');
-var semantic = require('../node_modules/semantic-ui-css/semantic.js');
+require('../node_modules/semantic-ui-css/semantic.js');
+require('./polyfills');
 
 // --- AWS config
 // Must be included before our components
@@ -32,16 +32,16 @@ AWS.config.credentials.get(function (err) {
 });
 
 // -- components
-var bus = require('./bus');
 // Root element for the router. Note that this is not an instance of Vue.
 var App = require('./components/App');
 var ComposePanel = require('./components/ComposePanel');
 var PostsPanel = require('./components/PostsPanel');
 var SettingsPanel = require('./components/SettingsPanel');
 
-// --- Set up variables
 
 $(document).ready(function () {
+
+	window.posts = [];
 
 	Vue.use(VueRouter);
 
@@ -49,12 +49,15 @@ $(document).ready(function () {
 
 	router.map({
 		'/posts': {
+			name: 'posts',
 			component: PostsPanel
 		},
-		'/compose': {
+		'/compose/:etag': {
+			name: 'compose',
 			component: ComposePanel
 		},
 		'/settings': {
+			name: 'settings',
 			component: SettingsPanel
 		}
 	});

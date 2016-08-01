@@ -1,4 +1,15 @@
-<p>This is the post compose/edit page</p>
-<textarea name="post" :model="postContent" cols="65" rows="10"></textarea>
-<br>
-<button @click="publishPost" class="ui primary button">Publish</button>
+<div>
+	<div class="ui form">
+		<div class="field">
+			<label for="">Filename</label>
+			<input type="text" v-model="key" placeholder="post-name.md">
+		</div>
+		<div class="field">
+			<label for="">Content</label>
+			<textarea name="post" v-model="postContent" cols="65" rows="10"></textarea>
+		</div>
+	</div>
+
+	<br>
+	<button @click="publishPost" class="ui primary button">Publish</button>
+</div>

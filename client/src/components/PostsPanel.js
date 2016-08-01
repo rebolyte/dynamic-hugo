@@ -3,7 +3,7 @@
 
 var bus = require('../bus');
 var PostList = require('./PostList');
-var template = require('raw!./PostsPanel.html');
+var template = require('./PostsPanel.html');
 
 module.exports = {
 	template: template,

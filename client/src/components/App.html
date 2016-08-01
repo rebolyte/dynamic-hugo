@@ -5,11 +5,18 @@
 
 	<br><br>
 
-	<ul>
-		<li><a href="#" v-link="{ path: '/compose' }">Create New Post</a></li>
-		<li><a href="#" v-link="{ path: '/posts' }">Post List</a></li>
-		<li><a href="#" v-link="{ path: '/settings' }">Settings</a></li>
-	</ul>
+	<aside class="menu">
+		<div class="ui fluid vertical menu">
+			<a href="#" class="item active" v-link="{ path: '/compose/new' }">
+				Create New Post
+			</a>
+			<a href="#" class="item" v-link="{ path: '/posts' }">Post List</a>
+			<a href="#" class="item" v-link="{ path: '/settings' }">Settings</a>
+		</div>
+	</aside>
 
-	<router-view></router-view>
+	<section class="content">
+		<!-- Add keep-alive attr here to remove rerendering -->
+		<router-view></router-view>
+	</section>
 </div>
