@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.4.7",
+    "raw-loader": "^0.5.1",
     "semantic-ui-css": "^2.2.2",
     "vue": "^1.0.26",
     "vue-router": "^0.7.13",

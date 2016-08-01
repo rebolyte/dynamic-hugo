@@ -1,0 +1,22 @@
+<div class="ui small modal" v-el:modal>
+	<div class="header">Login</div>
+	<div class="content">
+		<form class="ui form" v-el:form>
+			<div class="field">
+				<label>Email</label>
+				<input type="text" name="email" v-model="email" placeholder="me@abc.com">
+			</div>
+			<div class="field">
+				<label>Password</label>
+				<input type="password" name="password" v-model="password">
+			</div>
+			<div class="ui error message"></div>
+		</form>
+	</div>
+	<div class="actions">
+		<div class="ui positive labeled icon button" v-el:login-button>
+			<i class="checkmark icon"></i>
+			Login
+		</div>
+	</div>
+</div>

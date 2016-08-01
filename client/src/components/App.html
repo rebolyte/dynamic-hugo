@@ -1,0 +1,15 @@
+<div>
+	<login-dialog show></login-dialog>
+
+	<h1>{{ title }}</h1>
+
+	<br><br>
+
+	<ul>
+		<li><a href="#" v-link="{ path: '/compose' }">Create New Post</a></li>
+		<li><a href="#" v-link="{ path: '/posts' }">Post List</a></li>
+		<li><a href="#" v-link="{ path: '/settings' }">Settings</a></li>
+	</ul>
+
+	<router-view></router-view>
+</div>

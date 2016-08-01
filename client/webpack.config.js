@@ -3,6 +3,7 @@
 
 let webpack = require('webpack');
 let path = require('path');
+let rawLoader = require('raw-loader');
 
 let SRC_DIR = path.resolve(__dirname, 'src');
 let DIST_DIR = path.resolve(__dirname, 'dist');
@@ -12,6 +13,11 @@ module.exports = {
 	output: {
 		path: DIST_DIR,
 		filename: 'bundle.js'
+	},
+	module: {
+		loaders: [
+			{ test: /\.html$/, loader: 'raw-loader' }
+		]
 	},
 	// https://webpack.github.io/docs/list-of-plugins.html#provideplugin
 	plugins: [

@@ -1,0 +1,11 @@
+<table class="ui celled striped table"">
+	<thead>
+		<tr><th colspan="3">
+			Posts
+		</th></tr>
+	</thead>
+	<tbody>
+		<!-- http://vuejs.org/guide/components.html#Template-Parsing -->
+		<tr is="post" v-for="post in posts" :post="post"></tr>
+	</tbody>
+</table>

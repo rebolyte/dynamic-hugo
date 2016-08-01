@@ -12,6 +12,7 @@ var VueRouter = require('vue-router');
 var semantic = require('../node_modules/semantic-ui-css/semantic.js');
 
 // --- AWS config
+// Must be included before our components
 
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Credentials.html
 // http://stackoverflow.com/a/27561468/2486583
@@ -30,223 +31,19 @@ AWS.config.credentials.get(function (err) {
 	else { console.log('cognito credentials loaded'); }
 });
 
+// -- components
+var bus = require('./bus');
+// Root element for the router. Note that this is not an instance of Vue.
+var App = require('./components/App');
+var ComposePanel = require('./components/ComposePanel');
+var PostsPanel = require('./components/PostsPanel');
+var SettingsPanel = require('./components/SettingsPanel');
+
 // --- Set up variables
-
-var lambda = new AWS.Lambda({
-	region: 'us-east-1'
-});
-
-var s3 = new AWS.S3();
-
-// Set up utilities to make working with the DOM nicer
-// var $ = document.querySelector.bind(document);
-// var $$ = document.querySelectorAll.bind(document);
-// Node.prototype.on = Node.prototype.addEventListener;
-
-function sendLogin(email, pass) {
-	return new Promise(function (resolve, reject) {
-		var input = {
-			email: email,
-			password: pass
-		};
-		var output;
-		var creds;
-		lambda.invoke({
-			FunctionName: 'JIBlogLogin',
-			Payload: JSON.stringify(input)
-		}, function (err, data) {
-			if (err) {
-				reject(err);
-			}
-			else {
-				output = JSON.parse(data.Payload);
-				if (!output.login) {
-					resolve({ success: false });
-				} else {
-					creds = AWS.config.credentials;
-					creds.params.IdentityId = output.identityId;
-					creds.params.Logins = {
-						'cognito-identity.amazonaws.com': output.token
-					};
-					creds.expired = true;
-
-					resolve({ success: true });
-				}
-			}
-		});
-	});
-}
-
-var bus = new Vue();
-
-var LoginDialog = Vue.extend({
-	template: '#loginDialogTemplate',
-	name: 'LoginDialog', // not required, but useful for debugging
-	data: function () {
-		return {
-			email: '',
-			password: ''
-		};
-	},
-	props: {
-		show: {
-			type: Boolean,
-			// required: true,
-			twoWay: true
-		}
-	},
-	// called after compilation is finished
-	ready: function () {
-		if (this.show) {
-			this.open();
-		}
-	},
-	methods: {
-		login: function () {
-			return sendLogin(this.email, this.password);
-		},
-		// http://stackoverflow.com/a/29713297/2486583
-		open: function () {
-			$(this.$els.modal)
-				.modal({
-					'closable': false,
-					onApprove: function () {
-						$(this.$els.form).submit();
-						// Prevent modal from closing
-						return false;
-					}.bind(this)
-				})
-				.modal('show');
-			$(this.$els.form)
-				.submit(function (evt) {
-					evt.preventDefault();
-					if ($(this.$els.form).form('validate form')) {
-						this.login().then(function (resp) {
-							if (resp.success) {
-								console.log('success');
-								this.close();
-							} else {
-								alert('login failed');
-							}
-						}.bind(this)).catch(function (err) {
-							console.error(err);
-						});
-					}
-				}.bind(this))
-				.form({
-					fields: {
-						email: 'email',
-						password: 'empty'
-					}
-				});
-		},
-		close: function () {
-			$(this.$els.modal).modal('hide');
-		}
-	}
-});
-
-var Post = Vue.extend({
-	template: '#postTemplate',
-	name: 'Post',
-	props: ['post'],
-	methods: {
-		selected: function (evt) {
-			console.log(evt.target);
-		}
-	}
-});
-
-var PostList = Vue.extend({
-	template: '#postListTemplate',
-	name: 'PostList',
-	data: function () {
-		return {
-			posts: []
-		};
-	},
-	methods: {
-		getPosts: function (evt) {
-			var params = {
-				Bucket: 'ji-blog-src',
-				Prefix: 'content/'
-			};
-			s3.listObjects(params, function (err, data) {
-				if (err) { throw new Error(err); }
-				console.log(data.Contents);
-				this.posts = data.Contents.map(function (o) {
-					return {
-						filename: o.Key,
-						date: o.LastModified
-					};
-				});
-			}.bind(this));
-		}
-	},
-	created: function () {
-		bus.$on('logged-in', this.getPosts);
-	},
-	destroyed: function () {
-		bus.$off('logged-in', this.getPosts);
-	},
-	components: {
-		'post': Post
-	}
-});
-
-var ComposePanel = Vue.extend({
-	template: '<p>This is the post compose/edit page</p>' +
-		'<textarea name="post" id="postFld" cols="65" rows="10"></textarea>' +
-		'<br>' +
-		'<button id="postBtn" class="ui primary button">Publish</button>'
-});
-
-var PostsPanel = Vue.extend({
-	template: '<p>This is the list of posts</p>' +
-		'<post-list></post-list>' +
-		'<br><br>' +
-		'<button @click="getPosts" class="ui button">Get Posts</button>',
-	methods: {
-		getPosts: function () {
-			bus.$emit('logged-in');
-		}
-	},
-	components: {
-		'post-list': PostList
-	}
-});
-
-var SettingsPanel = Vue.extend({
-	template: '<p>This is the settings page, fool!</p>'
-});
 
 $(document).ready(function () {
 
-	$('#postBtn').on('click', function () {
-		var params = {
-			Bucket: 'ji-blog-src',
-			Key: 'content/new-page.md',
-			Body: $('#postFld').value
-		};
-		s3.putObject(params, function (err, data) {
-			if (err) { throw new Error(err); }
-			console.log(data);
-		});
-	});
-
 	Vue.use(VueRouter);
-
-	// Root element for the router. Note that this is not an instance of Vue.
-	var App = Vue.extend({
-		data: function () {
-			return {
-				title: 'blog admin'
-			};
-		},
-		components: {
-			'login-dialog': LoginDialog
-		}
-	});
 
 	var router = new VueRouter();
 
