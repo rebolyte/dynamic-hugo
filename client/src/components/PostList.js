@@ -11,8 +11,9 @@ var template = require('./PostList.html');
 var s3 = new AWS.S3();
 
 function mapPosts(o) {
+	var parts = o.Key.split('/');
 	return {
-		filename: o.Key,
+		filename: parts[parts.length - 1],
 		date: moment.parseZone(o.LastModified).format('D MMM, YYYY h:mm A z'),
 		etag: o.ETag
 	};

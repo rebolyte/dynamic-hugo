@@ -13,7 +13,8 @@ module.exports = {
 	data: function () {
 		return {
 			postContent: '---\ndate: ' + moment().format() + '\ntitle: new post\n---\n\n',
-			key: ''
+			key: '',
+			publishSuccess: false
 		};
 	},
 	ready: function () {
@@ -23,7 +24,8 @@ module.exports = {
 			}.bind(this));
 			if (et) {
 				// console.log(et);
-				this.key = et.Key;
+				var parts = et.Key.split('/');
+				this.key = parts[parts.length - 1];
 				var params = {
 					Bucket: 'ji-blog-src',
 					Key: et.Key
@@ -48,13 +50,20 @@ module.exports = {
 			if (!this.key) {
 				alert('Please enter a filename.');
 				return;
+			} else if (!/.md$/.test(this.key)) {
+				alert('Filename must end in .md.');
+				return;
 			} else {
-				params.Key = this.key;
+				params.Key = 'content/blog/' + this.key;
 			}
 			s3.putObject(params, function (err, data) {
 				if (err) { throw new Error(err); }
 				console.log(data);
-			});
+				this.publishSuccess = true;
+				setTimeout(function () {
+					this.$route.router.go({ name: 'posts' });
+				}.bind(this), 1000);
+			}.bind(this));
 		}
 	}
 };
