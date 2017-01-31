@@ -5,6 +5,8 @@ let AWS = require('aws-sdk');
 let s3Package = require('s3');
 let childProcess = require('child_process');
 
+let config = require('./config');
+
 // https://github.com/ryansb/hugo-lambda/blob/master/generate/lib/RunHugo.js
 
 let s3 = new AWS.S3();
@@ -14,8 +16,6 @@ let s3Client = s3Package.createClient({
 	s3Client: s3
 });
 
-let srcBucket = 'ji-blog-src';
-let destBucket = 'blog.james-irwin.com';
 let tmpDir = '/tmp/src';
 let outDir = tmpDir + '/public';
 
@@ -24,7 +24,7 @@ function downloadSrcDir() {
 		let dl = s3Client.downloadDir({
 			localDir: tmpDir,
 			s3Params: {
-				Bucket: srcBucket
+				Bucket: config.srcBucket
 			}
 		});
 		dl.on('error', reject);
@@ -58,7 +58,7 @@ function uploadBuiltDir() {
 			localDir: outDir,
 			deleteRemoved: false,
 			s3Params: {
-				Bucket: destBucket
+				Bucket: config.destBucket
 			}
 		});
 		ul.on('error', reject);
