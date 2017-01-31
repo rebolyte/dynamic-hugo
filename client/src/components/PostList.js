@@ -1,14 +1,15 @@
 /* eslint-env node, browser */
 'use strict';
 
-require('aws-sdk/dist/aws-sdk');
-var AWS = window.AWS;
+var S3 = require('aws-sdk/clients/s3');
 var moment = require('moment');
 var bus = require('../bus');
 var Post = require('./Post');
 var template = require('./PostList.html');
 
-var s3 = new AWS.S3();
+var CONFIG = require('../config');
+
+var s3 = new S3();
 
 function mapPosts(o) {
 	var parts = o.Key.split('/');
@@ -30,8 +31,8 @@ module.exports = {
 	methods: {
 		getPosts: function (evt) {
 			var params = {
-				Bucket: 'ji-blog-src',
-				Prefix: 'content/blog/'
+				Bucket: CONFIG.s3SrcBucket,
+				Prefix: CONFIG.s3SrcBucketPrefix
 			};
 			s3.listObjects(params, function (err, data) {
 				if (err) { throw new Error(err); }

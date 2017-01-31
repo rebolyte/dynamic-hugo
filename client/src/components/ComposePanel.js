@@ -1,11 +1,12 @@
 /* eslint-env node, browser */
 'use strict';
 
-require('aws-sdk/dist/aws-sdk');
-var AWS = window.AWS;
-var s3 = new AWS.S3();
+var S3 = require('aws-sdk/clients/s3');
+var s3 = new S3();
 var moment = require('moment');
 var template = require('./ComposePanel.html');
+
+var CONFIG = require('../config');
 
 module.exports = {
 	template: template,
@@ -27,7 +28,7 @@ module.exports = {
 				var parts = et.Key.split('/');
 				this.key = parts[parts.length - 1];
 				var params = {
-					Bucket: 'ji-blog-src',
+					Bucket: CONFIG.s3SrcBucket,
 					Key: et.Key
 				};
 				s3.getObject(params, function (err, data) {
@@ -44,7 +45,7 @@ module.exports = {
 	methods: {
 		publishPost: function () {
 			var params = {
-				Bucket: 'ji-blog-src',
+				Bucket: CONFIG.s3SrcBucket,
 				Body: this.postContent
 			};
 			if (!this.key) {
@@ -54,7 +55,7 @@ module.exports = {
 				alert('Filename must end in .md.');
 				return;
 			} else {
-				params.Key = 'content/blog/' + this.key;
+				params.Key = CONFIG.s3SrcBucketPrefix + this.key;
 			}
 			s3.putObject(params, function (err, data) {
 				if (err) { throw new Error(err); }

@@ -16,7 +16,8 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.html$/, loader: 'raw-loader' }
+			{ test: /\.html$/, loader: 'raw-loader' },
+			{ test: /\.json$/, loader: 'json-loader' }
 		]
 	},
 	// https://webpack.github.io/docs/list-of-plugins.html#provideplugin

@@ -4,6 +4,7 @@
 let AWS = require('aws-sdk');
 let s3Package = require('s3');
 let childProcess = require('child_process');
+let fs = require('fs');
 
 let config = require('./config');
 
@@ -66,11 +67,31 @@ function uploadBuiltDir() {
 	});
 }
 
+function removeAllFiles(dirPath) {
+	let files = null;
+	let filePath = null;
+	try {
+		files = fs.readdirSync(dirPath);
+	}
+	catch (e) { return; }
+	if (files.length) {
+		files.forEach(file => {
+			filePath = dirPath + '/' + file;
+			if (fs.statSync(filePath).isFile()) {
+				fs.unlinkSync(filePath);
+			}
+		});
+	} else {
+		removeAllFiles(filePath);
+	}
+}
+
 exports.handler = function (event, context, cb) {
 	downloadSrcDir()
 	.then(runHugo)
 	.then(uploadBuiltDir)
 	.then(() => {
+		removeAllFiles(tmpDir); // because the Lambda instance might be reused across invocations
 		cb(null, 'exiting normally');
 	})
 	.catch(err => {

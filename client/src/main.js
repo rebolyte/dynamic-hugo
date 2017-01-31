@@ -2,14 +2,14 @@
 /* global $ */
 'use strict';
 
-// Webpack + AWS SDK workaround
-// https://github.com/aws/aws-sdk-js/issues/603#issuecomment-188454178
-require('aws-sdk/dist/aws-sdk');
-var AWS = window.AWS;
+// Using SDK with Webpack: https://github.com/aws/aws-sdk-js/issues/603
+var AWS = require('aws-sdk');
 var Vue = require('vue');
 var VueRouter = require('vue-router');
 require('../node_modules/semantic-ui-css/semantic.js');
 require('./polyfills');
+
+var CONFIG = require('./config');
 
 // --- AWS config
 // Must be included before our components
@@ -21,7 +21,7 @@ require('./polyfills');
 // https://mobile.awsblog.com/post/TxBVEDL5Z8JKAC/Use-Amazon-Cognito-in-your-website-for-simple-AWS-authentication
 AWS.config.region = 'us-east-1';
 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-	IdentityPoolId: 'us-east-1:2d7ca187-7471-45cd-bc71-5d78b6bcd7d1'
+	IdentityPoolId: CONFIG.cognitoPoolId
 });
 
 AWS.config.credentials.clearCachedId();

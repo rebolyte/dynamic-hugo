@@ -6,6 +6,8 @@ let AWS = require('aws-sdk');
 let crypto = require('crypto');
 let readline = require('readline');
 
+let CONFIG = require('./config');
+
 let rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
@@ -40,7 +42,7 @@ function computeHash(password) {
 function storeUser(email, passHash, passSalt) {
 	return new Promise((resolve, reject) => {
 		docClient.put({
-			TableName: 'JIBlogAdminUsers',
+			TableName: CONFIG.DyDBTable,
 			Item: {
 				email: email,
 				passHash: passHash,

@@ -2,12 +2,13 @@
 /* global $ */
 'use strict';
 
-require('aws-sdk/dist/aws-sdk');
-var AWS = window.AWS;
+var Lambda = require('aws-sdk/clients/lambda');
 var bus = require('../bus');
 var template = require('./LoginDialog.html');
 
-var lambda = new AWS.Lambda({
+var CONFIG = require('../config');
+
+var lambda = new Lambda({
 	region: 'us-east-1'
 });
 
@@ -20,7 +21,7 @@ function sendLogin(email, pass) {
 		var output;
 		var creds;
 		lambda.invoke({
-			FunctionName: 'JIBlogLogin',
+			FunctionName: CONFIG.lambdaLoginFunc,
 			Payload: JSON.stringify(input)
 		}, function (err, data) {
 			if (err) {
